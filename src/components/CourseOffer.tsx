@@ -1,16 +1,28 @@
 import { Fragment, useEffect, useState } from "react";
 import AutoCompleteText from "./AutoCompleteText";
-import { getCurriculum, getFaculties } from "../redux/semetser/semesterSlice";
+import { SemesterState, getCurriculum, getFaculties } from "../redux/semetser/semesterSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 
 
 export const CourseOffer = function () {
-	const { faculty, curriculum } = useSelector((state: RootState) => state.semester);
+	const { faculty, curriculum, semester } = useSelector((state: RootState) => state.semester);
 	const dispatch = useDispatch<AppDispatch>();
 
+	// Remove the unused variable 'changeSemester'
+	// const [changeSemester, setchangeSemester]: SemesterState[] = useState();
 
+	// Update the useState hook to correctly assign the initial state value
+	const [changeSemester, setchangeSemester] = useState('Fall');
 
+	function handelClick() {
+		if(changeSemester === 'Fall'){
+			setchangeSemester("Spring");
+		}
+		else{
+			setchangeSemester("Fall");
+		}
+	}
 
 	useEffect(() => {
 		dispatch(getCurriculum());
@@ -40,9 +52,12 @@ export const CourseOffer = function () {
 				<tbody>
 					<tr>
 						<th colSpan={9} style={{ fontWeight: "bold", fontSize: "16pt" }}>
-							<a href="#" style={{ textDecoration: "none", color: "blue" }}>
-								{'Fall'} Semester
-							</a>
+							<button
+							onClick={handelClick}
+							style={{ textDecoration: "none",border:0, color: "blue" }}>
+								{changeSemester}
+								
+							</button>
 						</th>
 					</tr>
 					<tr>
@@ -54,25 +69,25 @@ export const CourseOffer = function () {
 							</a>
 						</td>
 					</tr>
-					{sems.map((s, scnt) => (
-						<Fragment key={s.sno}>
-							<tr style={{ fontWeight: "bold" }}>
-								<th colSpan={2}>{s.name} Semester</th>
-								{/* {secs[scnt].map((sec, seci) => (
-									<th key={seci} style={{ width: "200px" }}>
-										{sec}
-									</th>
-								))} */}
-							</tr>
-						</Fragment>
-					))}
-					{curriculum.map((c, i) => (
-						<tr key={c.cid} style={{ height: "25px" }}>
-							<td style={{ textAlign: "center" }}>{i + 1}</td>
-							<td>{c.title}</td>
-							{/* {secs[scnt].map((sec, i) => <td key={i}></td>)} */}
-						</tr>
-					))}
+					{sems.filter(s => semester === 'Fall' ? s.sno % 2 !== 0 : s.sno % 2 === 0)
+  .map((s, scnt) => (
+    <Fragment key={s.sno}>
+      <tr style={{ fontWeight: "bold" }}>
+        <th colSpan={2}>{s.name} Semester</th>
+      </tr>
+      {curriculum.filter(c => c.semno === s.sno)
+        .map((c, i) => (
+          <tr key={c.cid} style={{ height: "25px" }}>
+            <td style={{ textAlign: "center" }}>{i + 1}</td>
+            <td>{c.title}</td>
+            {/* Optional: Add here other cells for sections if needed */}
+          </tr>
+        ))}
+    </Fragment>
+  ))}
+
+				
+					
 				</tbody>
 			</table>
 		</div>

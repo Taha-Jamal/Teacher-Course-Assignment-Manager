@@ -43,7 +43,11 @@ export const getFaculties = createAsyncThunk("semester/getFaculty", async () => 
 export const semesterSlice = createSlice({
 	name: "semester",
 	initialState,
-	reducers: {},
+	reducers: {
+		changeSemester(state)  {
+			state.semester = ['Fall','Spring'][['Fall','Spring'].indexOf(state.semester)+1 % 2] as typeof state.semester;
+		}
+	},
 	extraReducers: (builder) => {
 		builder
 			.addCase(getCurriculum.pending, (state) => {
@@ -71,6 +75,6 @@ export const semesterSlice = createSlice({
 	},
 });
 
-export const {  } = semesterSlice.actions;
+export const { changeSemester } = semesterSlice.actions;
 export const semesterReducer = semesterSlice.reducer;
 export const selectCount = (state: RootState) => state.semester;
